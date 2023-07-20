@@ -1,7 +1,7 @@
 package com.rms.serviceImpl;
 
 import com.rms.constants.RestoConstants;
-import com.rms.dao.UserDoa;
+import com.rms.dao.UserDao;
 import com.rms.model.User;
 import com.rms.service.UserService;
 import com.rms.utils.RestoUtils;
@@ -19,7 +19,7 @@ import java.util.Objects;
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    private UserDoa userDoa;
+    private UserDao userDoa;
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
         log.info("Inside SignUp {} ", requestMap);
