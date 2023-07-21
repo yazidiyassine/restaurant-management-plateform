@@ -26,6 +26,8 @@ public class SecurityConfig  {
     @Autowired
     CustomerUserDetailsService customerUserDetailsService;
 
+    @Autowired
+    JwtFilter jwtFilter;
     @Bean
     public PasswordEncoder passwordEncoder(){
         return NoOpPasswordEncoder.getInstance();
@@ -52,6 +54,8 @@ public class SecurityConfig  {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .httpBasic(Customizer.withDefaults());
+
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         http.headers().frameOptions().disable();
         return http.build();
     }
