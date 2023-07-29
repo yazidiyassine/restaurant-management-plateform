@@ -34,6 +34,8 @@ public class CustomerUserDetailsService implements UserDetailsService {
     }
 
     public com.rms.model.User getUserDetail(){
+        com.rms.model.User userDetail = this.userDetail;
+        userDetail.setPassword(null);
         return userDetail;
     }
 }
