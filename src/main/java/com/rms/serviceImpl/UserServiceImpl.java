@@ -8,6 +8,7 @@ import com.rms.dao.UserDao;
 import com.rms.model.User;
 import com.rms.service.UserService;
 import com.rms.utils.RestoUtils;
+import com.rms.wrapper.UserWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
@@ -18,8 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -36,6 +36,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     JwtUtil jwtUtil;
+
+    @Autowired
+    JwtFilter jwtFilter;
 
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
@@ -78,6 +81,40 @@ public class UserServiceImpl implements UserService {
             e.printStackTrace();
         }
         return new ResponseEntity<String>("{\"message\":\""+"Invalid Credentials!"+"\"}", HttpStatus.UNAUTHORIZED);
+    }
+
+    @Override
+    public ResponseEntity<List<UserWrapper>> getAllUsers() {
+        try {
+            if (jwtFilter.isAdmin()){
+                return new ResponseEntity<>(userDoa.getAllUsers(), HttpStatus.OK);
+            }else{
+                return new ResponseEntity<>(new ArrayList<>(), HttpStatus.UNAUTHORIZED);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> update(Map<String, String> requestMap) {
+        try{
+            if (jwtFilter.isAdmin() ){
+                Optional<User> optionalUser =  userDoa.findById(Integer.parseInt(requestMap.get("id")));
+                if (!optionalUser.isEmpty()){
+                    userDoa.updateStatus(requestMap.get("status"), Integer.parseInt(requestMap.get("id")));
+                    return RestoUtils.getResponseEntity("User status updated successfully", HttpStatus.OK);
+                }else {
+                    return RestoUtils.getResponseEntity("User id does not exist", HttpStatus.BAD_REQUEST);
+                }
+            }else {
+                return RestoUtils.getResponseEntity(RestoConstants.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return RestoUtils.getResponseEntity(RestoConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private boolean validateSignUpMap(Map<String, String> reqMap){
