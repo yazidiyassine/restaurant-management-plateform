@@ -7,6 +7,7 @@ import com.rms.constants.RestoConstants;
 import com.rms.dao.UserDao;
 import com.rms.model.User;
 import com.rms.service.UserService;
+import com.rms.utils.EmailUtils;
 import com.rms.utils.RestoUtils;
 import com.rms.wrapper.UserWrapper;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     JwtFilter jwtFilter;
+
+    @Autowired
+    EmailUtils emailUtils;
 
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
@@ -104,6 +108,7 @@ public class UserServiceImpl implements UserService {
                 Optional<User> optionalUser =  userDoa.findById(Integer.parseInt(requestMap.get("id")));
                 if (!optionalUser.isEmpty()){
                     userDoa.updateStatus(requestMap.get("status"), Integer.parseInt(requestMap.get("id")));
+                    sneMailToAllAdmin(requestMap.get("status"), optionalUser.get().getEmail(), userDoa.getAllAdmins());
                     return RestoUtils.getResponseEntity("User status updated successfully", HttpStatus.OK);
                 }else {
                     return RestoUtils.getResponseEntity("User id does not exist", HttpStatus.BAD_REQUEST);
@@ -115,6 +120,16 @@ public class UserServiceImpl implements UserService {
             e.printStackTrace();
         }
         return RestoUtils.getResponseEntity(RestoConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private void sneMailToAllAdmin(String status, String user, List<String> allAdmins) {
+
+        allAdmins.remove(jwtFilter.getCurrentUser());
+        if (status != null && status.equalsIgnoreCase("true")){
+            emailUtils.sendSimpleMessage(jwtFilter.getCurrentUser(), "Account Approved", "USER:- "+ user +" has been approved by Admin:- "+jwtFilter.getCurrentUser()+".", allAdmins);
+        }else{
+            emailUtils.sendSimpleMessage(jwtFilter.getCurrentUser(), "Account Rejected", "USER:- "+ user +" has been rejected by Admin:- "+jwtFilter.getCurrentUser()+".", allAdmins);
+        }
     }
 
     private boolean validateSignUpMap(Map<String, String> reqMap){

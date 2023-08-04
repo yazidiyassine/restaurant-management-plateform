@@ -14,6 +14,8 @@ import java.io.Serializable;
 
 @NamedQuery(name = "User.updateStatus", query = "update User u set u.status = :status where u.id = :id")
 
+@NamedQuery(name = "User.getAllUsers", query = "SELECT u.email FROM User u where u.role = 'ADMIN'")
+
 @Entity
 @DynamicUpdate
 @DynamicInsert
