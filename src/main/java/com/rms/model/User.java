@@ -1,7 +1,6 @@
 package com.rms.model;
 
 import jakarta.persistence.*;
-import jdk.jfr.Name;
 import lombok.Data;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -14,7 +13,7 @@ import java.io.Serializable;
 
 @NamedQuery(name = "User.updateStatus", query = "update User u set u.status = :status where u.id = :id")
 
-@NamedQuery(name = "User.getAllUsers", query = "SELECT u.email FROM User u where u.role = 'ADMIN'")
+@NamedQuery(name = "User.getAllAdmins", query = "SELECT u.email FROM User u where u.role = 'ADMIN'")
 
 @Entity
 @DynamicUpdate

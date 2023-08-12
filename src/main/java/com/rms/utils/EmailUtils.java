@@ -11,19 +11,22 @@ import java.util.List;
 public class EmailUtils {
 
     @Autowired
-    JavaMailSender javaMailSender;
+    private JavaMailSender emailSender;
 
     public void sendSimpleMessage(String to, String subject, String text, List<String> list){
         SimpleMailMessage message = new SimpleMailMessage();
 
-        message.setFrom("yyy@mailinator.com");
+        message.setFrom("xxxx");
         message.setTo(to);
         message.setSubject(subject);
         message.setText(text);
 
-        if (list != null && !list.isEmpty())
+        if (list != null && !list.isEmpty()) {
             message.setCc(getCcArray(list));
-        javaMailSender.send(message);
+            emailSender.send(message);
+        } else {
+            emailSender.send(message);
+        }
     }
 
     private String[] getCcArray(List<String> ccList){

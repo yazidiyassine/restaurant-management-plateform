@@ -12,7 +12,6 @@ import com.rms.utils.RestoUtils;
 import com.rms.wrapper.UserWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -108,7 +107,7 @@ public class UserServiceImpl implements UserService {
                 Optional<User> optionalUser =  userDoa.findById(Integer.parseInt(requestMap.get("id")));
                 if (!optionalUser.isEmpty()){
                     userDoa.updateStatus(requestMap.get("status"), Integer.parseInt(requestMap.get("id")));
-                    sneMailToAllAdmin(requestMap.get("status"), optionalUser.get().getEmail(), userDoa.getAllAdmins());
+                    sendMailToAllAdmin(requestMap.get("status"), optionalUser.get().getEmail(), userDoa.getAllAdmins());
                     return RestoUtils.getResponseEntity("User status updated successfully", HttpStatus.OK);
                 }else {
                     return RestoUtils.getResponseEntity("User id does not exist", HttpStatus.BAD_REQUEST);
@@ -122,7 +121,7 @@ public class UserServiceImpl implements UserService {
         return RestoUtils.getResponseEntity(RestoConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    private void sneMailToAllAdmin(String status, String user, List<String> allAdmins) {
+    private void sendMailToAllAdmin(String status, String user, List<String> allAdmins) {
 
         allAdmins.remove(jwtFilter.getCurrentUser());
         if (status != null && status.equalsIgnoreCase("true")){
