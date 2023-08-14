@@ -16,14 +16,23 @@ public interface UserRest {
     @PostMapping("/signup")
     public ResponseEntity<String> signUp(@RequestBody(required = true) Map<String, String> requestMap);
 
-    @PostMapping(path ="/login")
+    @PostMapping(path = "/login")
     public ResponseEntity<String> login(@RequestBody(required = true) Map<String, String> requestMap);
 
 
-    @GetMapping(path ="/get")
+    @GetMapping(path = "/get")
     public ResponseEntity<List<UserWrapper>> getAllUsers();
 
 
     @PostMapping(path = "/update")
     public ResponseEntity<String> update(@RequestBody(required = true) Map<String, String> requestMap);
+
+    @GetMapping(path = "/checkToken")
+    ResponseEntity<String> checkToken();
+
+    @PostMapping(path = "/changePassword")
+    ResponseEntity<String> changePassword(@RequestBody(required = true) Map<String, String> requestMap);
+
+    @PostMapping(path = "/forgotPassword")
+    ResponseEntity<String> forgotPassword(@RequestBody(required = true) Map<String, String> requestMap);
 }
