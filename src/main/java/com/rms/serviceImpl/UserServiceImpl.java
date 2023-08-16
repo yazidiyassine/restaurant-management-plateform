@@ -176,7 +176,9 @@ public class UserServiceImpl implements UserService {
         try{
             User user = userDoa.findByEmailId(requestMap.get("email"));
             if (user != null && !Strings.isNullOrEmpty(user.getEmail())){
-                }
+                emailUtils.forgotMail(user.getEmail(), "Credentials by RMS", user.getPassword());
+                return RestoUtils.getResponseEntity("Check your mail for Credentials", HttpStatus.OK);
+            }
             return RestoUtils.getResponseEntity("Check your mail for Credentials", HttpStatus.BAD_REQUEST);
         }catch (Exception e){
             e.printStackTrace();
