@@ -7,4 +7,5 @@ public class RestoConstants {
         public static final String  INVALID_DATA = "Invalid Data.";
 
     public static final String UNAUTHORIZED_ACCESS = "Unauthorized Access.";
+    public static final String CATEGORY_ADDED = "Category Added Successfully.";
 }
