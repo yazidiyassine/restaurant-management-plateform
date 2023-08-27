@@ -7,11 +7,14 @@ import com.rms.model.Category;
 import com.rms.model.Product;
 import com.rms.service.ProductService;
 import com.rms.utils.RestoUtils;
+import com.rms.wrapper.ProductWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -39,6 +42,8 @@ public class ProductServiceImpl implements ProductService {
         return RestoUtils.getResponseEntity(RestoConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+
+
     private Product getProductFromMap(Map<String, String> requestMap, boolean isAdd) {
         Product product = new Product();
         Category category = new Category();
@@ -64,5 +69,15 @@ public class ProductServiceImpl implements ProductService {
             } else return !validateId;
         }
         return false;
+    }
+
+    @Override
+    public ResponseEntity<List<ProductWrapper>> getAllProducts() {
+        try{
+            return new ResponseEntity<>(productDao.getAllProducts(), HttpStatus.OK);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -69,16 +69,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public ResponseEntity<List<Category>> getAllCategories(String filterValue) {
         try {
-            if(!Strings.isNullOrEmpty(filterValue) && filterValue.equalsIgnoreCase("true")){
-                log.info("Filtering categories: inside if");
+            if(!Strings.isNullOrEmpty(filterValue) && filterValue.equalsIgnoreCase("true"))
                 return new ResponseEntity<>(categoryDao.getAllCategories(), HttpStatus.OK);
-            }
             return new ResponseEntity<>(categoryDao.findAll(), HttpStatus.OK);
         } catch (Exception exception){
             exception.printStackTrace();
         }
-        return new ResponseEntity<List<Category>>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+        return new ResponseEntity<List<Category>>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);}
 
     @Override
     public ResponseEntity<String> updateCategory(Map<String, String> requestMap) {

@@ -7,8 +7,8 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 
-@NamedQuery(name = "Category.getAllCategories", query= "SELECT c FROM Category c")
-
+@NamedQuery(name = "Category.getAllCategories", query = "select c from Category c where c.id in" +
+        " (select p.category from Product p where p.status='true')")
 @Entity
 @DynamicUpdate
 @DynamicInsert
