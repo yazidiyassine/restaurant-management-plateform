@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -28,20 +29,19 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<String> addNewProduct(Map<String, String> requestMap) {
-        try{
-            if (jwtFilter.isAdmin()){
+        try {
+            if (jwtFilter.isAdmin()) {
                 if (validateProductMap(requestMap, false)) {
                     productDao.save(getProductFromMap(requestMap, false));
                     return RestoUtils.getResponseEntity("Product was added successfully", HttpStatus.OK);
                 }
                 return RestoUtils.getResponseEntity(RestoConstants.INVALID_DATA, HttpStatus.BAD_REQUEST);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return RestoUtils.getResponseEntity(RestoConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
 
 
     private Product getProductFromMap(Map<String, String> requestMap, boolean isAdd) {
@@ -49,9 +49,9 @@ public class ProductServiceImpl implements ProductService {
         Category category = new Category();
 
         category.setId(Integer.parseInt(requestMap.get("categoryId")));
-        if (isAdd){
+        if (isAdd) {
             product.setId(Integer.parseInt(requestMap.get("id")));
-        }else {
+        } else {
             product.setStatus("true");
         }
         product.setCategory(category);
@@ -63,8 +63,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private boolean validateProductMap(Map<String, String> requestMap, boolean validateId) {
-        if(requestMap.containsKey("name")){
-            if(requestMap.containsKey("id") && validateId){
+        if (requestMap.containsKey("name")) {
+            if (requestMap.containsKey("id") && validateId) {
                 return true;
             } else return !validateId;
         }
@@ -73,11 +73,83 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<List<ProductWrapper>> getAllProducts() {
-        try{
+        try {
             return new ResponseEntity<>(productDao.getAllProducts(), HttpStatus.OK);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> updateProduct(Map<String, String> requestMap) {
+        try {
+            if (jwtFilter.isAdmin()) {
+                if (validateProductMap(requestMap, true)) {
+                    Optional<Product> optional = productDao.findById(Integer.parseInt(requestMap.get("id")));
+                    if (!optional.isEmpty()) {
+                        Product product = getProductFromMap(requestMap, true);
+                        product.setStatus(optional.get().getStatus());
+                        productDao.save(product);
+                        return RestoUtils.getResponseEntity("Product was updated successfully", HttpStatus.OK);
+                    } else {
+                        return RestoUtils.getResponseEntity("Product Id doesn't exist!", HttpStatus.BAD_REQUEST);
+                    }
+                } else {
+                    return RestoUtils.getResponseEntity(RestoConstants.INVALID_DATA, HttpStatus.BAD_REQUEST);
+                }
+            } else {
+                return RestoUtils.getResponseEntity(RestoConstants.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return RestoUtils.getResponseEntity(RestoConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> deleteProduct(Integer id) {
+        try {
+            if (jwtFilter.isAdmin()) {
+                Optional<Product> optional = productDao.findById(id);
+                if (optional.isPresent()) {
+                    productDao.deleteById(id);
+                    return RestoUtils.getResponseEntity("Product was deleted successfully", HttpStatus.OK);
+                } else {
+                    return RestoUtils.getResponseEntity("Product Id doesn't exist!", HttpStatus.BAD_REQUEST);
+                }
+            } else {
+                return RestoUtils.getResponseEntity(RestoConstants.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return RestoUtils.getResponseEntity(RestoConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> updateProductStatus(Map<String, String> requestMap) {
+        try {
+            if (jwtFilter.isAdmin()) {
+                if (requestMap.containsKey("id") && requestMap.containsKey("status")) {
+                    Optional<Product> optional = productDao.findById(Integer.parseInt(requestMap.get("id")));
+                    if (!optional.isEmpty()) {
+                        productDao.updateProductStatus(requestMap.get("status"), Integer.parseInt(requestMap.get("id")));
+                        return RestoUtils.getResponseEntity("Product status was updated successfully", HttpStatus.OK);
+                    } else {
+                        return RestoUtils.getResponseEntity("Product Id doesn't exist!", HttpStatus.BAD_REQUEST);
+                    }
+                } else {
+                    return RestoUtils.getResponseEntity(RestoConstants.INVALID_DATA, HttpStatus.BAD_REQUEST);
+                }
+            } else {
+                return RestoUtils.getResponseEntity(RestoConstants.UNAUTHORIZED_ACCESS, HttpStatus.UNAUTHORIZED);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return RestoUtils.getResponseEntity(RestoConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

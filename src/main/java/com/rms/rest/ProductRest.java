@@ -3,10 +3,7 @@ package com.rms.rest;
 
 import com.rms.wrapper.ProductWrapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -19,4 +16,13 @@ public interface ProductRest  {
 
     @GetMapping(path = "/all")
     ResponseEntity<List<ProductWrapper>> getAllProducts();
+
+    @PostMapping(path = "/update")
+    ResponseEntity<String> updateProduct(@RequestBody(required = true) Map<String, String> requestMap);
+
+    @PostMapping(path = "/delete/{id}")
+    ResponseEntity<String> deleteProduct(@PathVariable Integer id);
+
+    @PostMapping(path = "/updateStatus")
+    ResponseEntity<String> updateProductStatus(@RequestBody(required = true) Map<String, String> requestMap);
 }
